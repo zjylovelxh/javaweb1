@@ -76,18 +76,37 @@ public class UserController {
         }
     }
 
-    @Operation(summary = "搜索用户", description = "根据用户名搜索用户")
+    @Operation(summary = "搜索用户", description = "搜索用户")
     @ApiResponse(responseCode = "200", description = "搜索成功", content = @Content(mediaType = "application/json"))
     @GetMapping("search")
-    public Result search(@Parameter(description = "用户名") String uname, HttpServletRequest httpServletRequest) {
+    public Result search(@RequestParam(value = "uname", required = false) String uname,
+                         @RequestParam(value = "uaccount", required = false) String uaccount,
+                         @RequestParam(value = "gender", required = false) String gender,
+                         @RequestParam(value = "phone", required = false) String phone,
+                         @RequestParam(value = "email", required = false) String email,
+                         @RequestParam(value = "ustatus", required = false) String ustatus,
+                         @RequestParam(value = "createtime", required = false) String createtime, HttpServletRequest httpServletRequest) {
         Result result = checkgly(httpServletRequest);
         if (result.getCode() == 200) {
             LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
             if (!StringUtils.isAnyBlank(uname)) {
                 queryWrapper.like(User::getUname, uname);
+            }  if (!StringUtils.isAnyBlank(uaccount)) {
+                queryWrapper.like(User::getUaccount, uaccount);
+            }   if (!StringUtils.isAnyBlank(gender)) {
+                queryWrapper.eq(User::getGender, gender);
+            }  if (!StringUtils.isAnyBlank(phone)) {
+                queryWrapper.eq(User::getPhone, phone);
+            }  if (!StringUtils.isAnyBlank(email)) {
+                queryWrapper.eq(User::getEmail, email);
+            }  if (!StringUtils.isAnyBlank(ustatus)) {
+                queryWrapper.eq(User::getUstatus, ustatus);
+            }  if (!StringUtils.isAnyBlank(createtime)) {
+                queryWrapper.like(User::getCreatetime, createtime);
             }
             queryWrapper.eq(User::getIsdeleted, 0);
             List<User> list = userService.list(queryWrapper);
+            System.out.println("list = " + list);
             result.setData(list);
         }
         return result;
