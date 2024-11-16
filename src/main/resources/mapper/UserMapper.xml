@@ -31,4 +31,8 @@
     <update id="changeuser">
         update z_user set ustatus = #{ustatus}, updateTime = NOW() where id =#{id}
     </update>
+    <update id="updatedetail">
+        update  z_user set mpassword = #{mpassword} ,uname =#{uname} ,avatarUrl =#{avatarurl} ,gender =#{gender},
+                           phone =#{phone} ,email =#{email} , updateTime = NOW() where id =#{id}
+    </update>
 </mapper>

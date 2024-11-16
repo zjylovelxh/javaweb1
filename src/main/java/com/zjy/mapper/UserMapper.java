@@ -14,6 +14,9 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserMapper extends BaseMapper<User> {
 
     int changeuser(Integer id, Integer ustatus);
+
+
+    int updatedetail(Integer id, String avatarurl, String phone, String mpassword, String email, Integer gender, String uname);
 }
 
 

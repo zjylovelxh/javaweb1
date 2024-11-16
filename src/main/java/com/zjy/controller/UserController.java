@@ -8,6 +8,7 @@ import com.zjy.pojo.LoginRequest;
 import com.zjy.pojo.RegistRequest;
 import com.zjy.pojo.User;
 import com.zjy.service.UserService;
+import com.zjy.utils.MD5Util;
 import com.zjy.utils.Result;
 import com.zjy.utils.ResultCodeEnum;
 import io.swagger.v3.oas.annotations.Operation;
@@ -117,6 +118,35 @@ public class UserController {
         }
         return result;
 
+
+    }
+    @PostMapping("detailuser")
+    public Result detailuser(@RequestBody User user,HttpServletRequest httpServletRequest){
+        System.out.println("user = " + user);
+
+        Object attribute = httpServletRequest.getSession().getAttribute(SessionKeys.USER_LOGINSTSTE);
+        User user1=(User) attribute;
+        user.setId(user1.getId());
+        user1=userService.getById(user1.getId());
+        user.setUstatus(user1.getUstatus());
+        user.setUpdatetime(user1.getUpdatetime());
+        user.setCreatetime(user1.getCreatetime());
+        user.setVersion(user1.getVersion());
+        user.setIsdeleted(user.getIsdeleted());
+        if(StringUtils.isAnyBlank(user.getMpassword())){
+            user.setMpassword(user1.getMpassword());
+        }else{
+            user.setMpassword(MD5Util.encrypt(user.getMpassword()));
+        }
+        if(StringUtils.isAnyBlank(user.getUname())){
+            user.setUname(user1.getUname());
+        }if(StringUtils.isAnyBlank(user.getPhone())){
+            user.setPhone(user1.getPhone());
+        }if(StringUtils.isAnyBlank(user.getAvatarurl())){
+            user.setAvatarurl(user1.getAvatarurl());
+        }
+        Result result = userService.updatedetail(user);
+       return result;
 
     }
 

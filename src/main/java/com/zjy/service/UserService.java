@@ -19,4 +19,6 @@ public interface UserService extends IService<User> {
     User checksafe(User user);
 
     boolean myupdateById(Integer id, Integer ustatus);
+
+    Result updatedetail(User user);
 }

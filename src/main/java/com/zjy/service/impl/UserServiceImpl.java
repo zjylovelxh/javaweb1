@@ -65,7 +65,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             User one = userMapper.selectOne(lambdaQueryWrapper);
             if (one==null){
                 result=Result.build(null,ResultCodeEnum.LOGIN_ERROR);
-            }else{
+            } else if (one.getUstatus()==1) {
+                result=Result.build(null,ResultCodeEnum.BLACK_ACCOUNT);
+            } else{
                 one.setMpassword("");
                 result=Result.ok(one);
                 httpServletRequest.getSession().setAttribute(SessionKeys.USER_LOGINSTSTE,one);
@@ -88,6 +90,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public boolean myupdateById(Integer id, Integer ustatus) {
         return userMapper.changeuser(id,ustatus)>0;
+    }
+
+    @Override
+    public Result updatedetail(User user) {
+        int b=userMapper.updatedetail(user.getId(),user.getAvatarurl(),user.getPhone(),user.getMpassword(),user.getEmail(),user.getGender(),user.getUname());
+        if (b>0){
+            return Result.ok(1);
+        }
+        return Result.build(null,ResultCodeEnum.CDETAIL_ERROR);
     }
 }
 

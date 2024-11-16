@@ -16,7 +16,9 @@ public enum ResultCodeEnum {
     NO_GLY(509,"需要管理员权限"),
     DELETE_ERROE(510,"删除失败"),
     BLACK_ACCOUNT(511,"封号用户！"),
-    CHANGE_REEOR(512,"更新失败！");
+    CHANGE_REEOR(512,"更新失败！"),
+    CDETAIL_ERROR(513,"完善信息失败！");
+
 
     private Integer code;
     private String message;
