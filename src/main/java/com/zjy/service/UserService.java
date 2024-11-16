@@ -17,4 +17,6 @@ public interface UserService extends IService<User> {
     Result login(String uaccount, String mpassword, HttpServletRequest httpServletRequest);
 
     User checksafe(User user);
+
+    boolean myupdateById(Integer id, Integer ustatus);
 }

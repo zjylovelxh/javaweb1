@@ -1,7 +1,9 @@
 package com.zjy.controller;
 
+import com.alibaba.druid.sql.visitor.functions.Now;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zjy.mysession.SessionKeys;
+import com.zjy.pojo.DateUser;
 import com.zjy.pojo.LoginRequest;
 import com.zjy.pojo.RegistRequest;
 import com.zjy.pojo.User;
@@ -15,10 +17,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,7 +113,6 @@ public class UserController {
             }
             queryWrapper.eq(User::getIsdeleted, 0);
             List<User> list = userService.list(queryWrapper);
-            System.out.println("list = " + list);
             result.setData(list);
         }
         return result;
@@ -114,6 +120,16 @@ public class UserController {
 
     }
 
+     @PostMapping("changesave")
+     public  Result changesave(@RequestBody DateUser user){
+         System.out.println("user = " + user);
+         Integer id=user.getId();
+         boolean b = userService.myupdateById(id,user.getUstatus());
+         if(b){
+             return Result.ok(1);
+         }
+         return Result.build(null,ResultCodeEnum.CHANGE_REEOR);
+     }
     @Operation(summary = "删除用户", description = "根据用户ID删除用户")
     @ApiResponse(responseCode = "200", description = "删除成功", content = @Content(mediaType = "application/json"))
     @PostMapping("delete")

@@ -1,19 +1,19 @@
 package com.zjy.pojo;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.Version;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
-
-/**
- * @TableName z_user
- */
-@TableName(value ="z_user")
 @Data
-public class User implements Serializable {
-    @TableId
+@AllArgsConstructor
+@NoArgsConstructor
+public class DateUser implements Serializable {
     private Integer id;
+
 
     private String uaccount;
 
@@ -31,16 +31,11 @@ public class User implements Serializable {
 
     private Integer ustatus;
 
-    private Date createtime;
+    private String createtime;
 
+    private String updatetime;
 
-    private Date updatetime;
-
-    @Version
     private Integer version;
 
-    @TableLogic
     private Integer isdeleted;
-
-    private static final long serialVersionUID = 1L;
 }

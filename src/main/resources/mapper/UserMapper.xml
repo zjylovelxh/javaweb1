@@ -27,4 +27,8 @@
         createTime,updateTime,version,
         isDeleted
     </sql>
+
+    <update id="changeuser">
+        update z_user set ustatus = #{ustatus}, updateTime = NOW() where id =#{id}
+    </update>
 </mapper>
