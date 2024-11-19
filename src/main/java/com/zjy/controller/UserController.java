@@ -34,6 +34,11 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    /**
+     * 用户注册
+     * @param registRequest
+     * @return
+     */
     @Operation(summary = "用户注册", description = "用户注册接口，需要提供账号、密码和电话号码")
     @ApiResponse(responseCode = "200", description = "注册成功", content = @Content(mediaType = "application/json"))
     @PostMapping("regist")
@@ -58,6 +63,12 @@ public class UserController {
         }
     }
 
+    /**
+     * 用户登录校验
+     * @param loginRequest
+     * @param httpServletRequest
+     * @return
+     */
     @Operation(summary = "用户登录", description = "用户登录接口，需要提供账号和密码")
     @ApiResponse(responseCode = "200", description = "登录成功", content = @Content(mediaType = "application/json"))
     @PostMapping("login")
@@ -65,7 +76,7 @@ public class UserController {
                         HttpServletRequest httpServletRequest) {
         String uaccount = loginRequest.getUaccount();
         String mpassword = loginRequest.getMpassword();
-        String validateAccount = "^[\\w@\\$\\^!~,.\\*]{0,7}+$";
+        String validateAccount = "^[\\w@\\$\\^!~,.\\*]{6,7}+$";
         String validatePassword = "^[\\w@\\$\\^!~,.\\*]{8,16}+$";
         if (StringUtils.isAnyBlank(uaccount, mpassword)) {
             return Result.build(null, ResultCodeEnum.MESSAGE_NUll);
@@ -78,6 +89,18 @@ public class UserController {
         }
     }
 
+    /**
+     * 管理员按多条件查询用户
+     * @param uname
+     * @param uaccount
+     * @param gender
+     * @param phone
+     * @param email
+     * @param ustatus
+     * @param createtime
+     * @param httpServletRequest
+     * @return
+     */
     @Operation(summary = "搜索用户", description = "搜索用户")
     @ApiResponse(responseCode = "200", description = "搜索成功", content = @Content(mediaType = "application/json"))
     @GetMapping("search")
@@ -114,10 +137,19 @@ public class UserController {
 
 
     }
+
+    /**
+     * 修改用户基本信息
+     * @param user
+     * @param httpServletRequest
+     * @return
+     */
     @PostMapping("detailuser")
     public Result detailuser(@RequestBody User user,HttpServletRequest httpServletRequest){
+        if(StringUtils.isAllBlank(user.getUname(),user.getEmail(),user.getAvatarurl()) && user.getGender()==null){
+            return Result.build(null,ResultCodeEnum.UPDATE_ERROE);
+        }
         System.out.println("user = " + user);
-
         Object attribute = httpServletRequest.getSession().getAttribute(SessionKeys.USER_LOGINSTSTE);
         User user1=(User) attribute;
         user.setId(user1.getId());
@@ -126,24 +158,31 @@ public class UserController {
         user.setUpdatetime(user1.getUpdatetime());
         user.setCreatetime(user1.getCreatetime());
         user.setVersion(user1.getVersion());
-        user.setIsdeleted(user.getIsdeleted());
-        if(StringUtils.isAnyBlank(user.getMpassword())){
-            user.setMpassword(user1.getMpassword());
-        }else{
-            user.setMpassword(MD5Util.encrypt(user.getMpassword()));
-        }
+        user.setIsdeleted(user1.getIsdeleted());
+        user.setMpassword(user1.getMpassword());
+        user.setPhone(user1.getPhone());
         if(StringUtils.isAnyBlank(user.getUname())){
             user.setUname(user1.getUname());
-        }if(StringUtils.isAnyBlank(user.getPhone())){
-            user.setPhone(user1.getPhone());
         }if(StringUtils.isAnyBlank(user.getAvatarurl())){
+
             user.setAvatarurl(user1.getAvatarurl());
+            System.out.println(user.getAvatarurl());
+        }if(StringUtils.isAnyBlank(user.getEmail())){
+            user.setEmail(user1.getEmail());
+        }if(user.getGender()==null){
+            user.setGender(user1.getGender());
         }
+        System.out.println("user = " + user);
         Result result = userService.updatedetail(user);
        return result;
 
     }
 
+    /**
+     * 管理员更改用户状态
+     * @param user
+     * @return
+     */
      @PostMapping("changesave")
      public  Result changesave(@RequestBody DateUser user){
          System.out.println("user = " + user);
@@ -170,6 +209,12 @@ public class UserController {
         return result;
     }
 
+
+    /**
+     * 根据cookie检查是否为管理员
+     * @param httpServletRequest
+     * @return
+     */
     private Result checkgly(HttpServletRequest httpServletRequest) {
         Object attribute = httpServletRequest.getSession().getAttribute(SessionKeys.USER_LOGINSTSTE);
         User user = (User) attribute;
@@ -179,6 +224,11 @@ public class UserController {
         return Result.ok(null);
     }
 
+    /**
+     * 根据cookie获取1当前用户信息
+     * @param httpServletRequest
+     * @return
+     */
     @GetMapping("current")
     public Result getcurrentuser(HttpServletRequest httpServletRequest) {
         Object o = httpServletRequest.getSession().getAttribute(SessionKeys.USER_LOGINSTSTE);
@@ -196,8 +246,15 @@ public class UserController {
 
     }
 
+    /**
+     * 更改密码
+     * @param password，
+     * @param httpServletRequest
+     * @return
+     */
     @PostMapping("currentpassword")
     public  Result currentpassword(@RequestBody PasswordChange password, HttpServletRequest httpServletRequest){
+        String validatePassword = "^[\\w@\\$\\^!~,.\\*]{8,16}+$";
         Object attribute = httpServletRequest.getSession().getAttribute(SessionKeys.USER_LOGINSTSTE);
         User user=(User) attribute;
         User user1=userService.getById(user.getId());
@@ -208,13 +265,24 @@ public class UserController {
             return Result.build(null,ResultCodeEnum.PASSWORD_BYY);
         }else if(!MD5Util.encrypt(password.getMpassword()).equals(user1.getMpassword())){
             return Result.build(null,ResultCodeEnum.PASSWORD_ERROR);
+        } else if (!password.getMpassword1().matches(validatePassword)) {
+            return Result.build(null,ResultCodeEnum.PASSWORD_ERROR);
         }
         String p=MD5Util.encrypt(password.getMpassword1());
         user1.setMpassword(p);
 
         return  userService.updatedetail(user1);
-    }  @PostMapping("currentphone")
+    }
+
+    /**
+     * 更换关联手机号
+     * @param passwordandphone
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping("currentphone")
     public  Result currentphone(@RequestBody PasswordChange passwordandphone, HttpServletRequest httpServletRequest){
+        String validatePhone = "^1[3-9]\\d{9}$";
         Object attribute = httpServletRequest.getSession().getAttribute(SessionKeys.USER_LOGINSTSTE);
         User user=(User) attribute;
         User user1=userService.getById(user.getId());
@@ -225,10 +293,18 @@ public class UserController {
            return Result.build(null,ResultCodeEnum.PHONE_ERRORING);
        } else if (Objects.equals(passwordandphone.getPhone(), passwordandphone.getPhone1())) {
            return Result.build(null,ResultCodeEnum.PHONE_RE);
+       } else if (!passwordandphone.getPhone1().matches(validatePhone)) {
+           return Result.build(null,ResultCodeEnum.PHONE_ERROR);
        }
         user1.setPhone(passwordandphone.getPhone1());
         return  userService.updatedetail(user1);
     }
+
+    /**
+     * 退出登录并清楚cookie
+     * @param httpServletRequest
+     * @return
+     */
     @PostMapping("logout")
     public Result<Object> logout(HttpServletRequest httpServletRequest) {
         httpServletRequest.getSession().removeAttribute(SessionKeys.USER_LOGINSTSTE);
