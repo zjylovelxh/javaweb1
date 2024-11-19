@@ -17,7 +17,12 @@ public enum ResultCodeEnum {
     DELETE_ERROE(510,"删除失败"),
     BLACK_ACCOUNT(511,"封号用户！"),
     CHANGE_REEOR(512,"更新失败！"),
-    CDETAIL_ERROR(513,"完善信息失败！");
+    CDETAIL_ERROR(513,"完善信息失败！"),
+    PASSWORD_RE(514,"与原密码相同！"),
+    PASSWORD_BYY(515,"两次新密码不一致！"),
+    PASSWORD_ERRORING(516,"密码输入错误！"),
+    PHONE_ERRORING(517,"电话号码不正确！"),
+    PHONE_RE(518,"新旧电话号码相同！");
 
 
     private Integer code;

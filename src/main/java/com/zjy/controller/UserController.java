@@ -3,10 +3,7 @@ package com.zjy.controller;
 import com.alibaba.druid.sql.visitor.functions.Now;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zjy.mysession.SessionKeys;
-import com.zjy.pojo.DateUser;
-import com.zjy.pojo.LoginRequest;
-import com.zjy.pojo.RegistRequest;
-import com.zjy.pojo.User;
+import com.zjy.pojo.*;
 import com.zjy.service.UserService;
 import com.zjy.utils.MD5Util;
 import com.zjy.utils.Result;
@@ -26,10 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("user")
@@ -202,6 +196,39 @@ public class UserController {
 
     }
 
+    @PostMapping("currentpassword")
+    public  Result currentpassword(@RequestBody PasswordChange password, HttpServletRequest httpServletRequest){
+        Object attribute = httpServletRequest.getSession().getAttribute(SessionKeys.USER_LOGINSTSTE);
+        User user=(User) attribute;
+        User user1=userService.getById(user.getId());
+        System.out.println("user1 = " + user1);
+        if(Objects.equals(password.getMpassword(), password.getMpassword1())){
+            return Result.build(null,ResultCodeEnum.PASSWORD_RE);
+        } else if (!Objects.equals(password.getMpassword1(), password.getMpassword2())) {
+            return Result.build(null,ResultCodeEnum.PASSWORD_BYY);
+        }else if(!MD5Util.encrypt(password.getMpassword()).equals(user1.getMpassword())){
+            return Result.build(null,ResultCodeEnum.PASSWORD_ERROR);
+        }
+        String p=MD5Util.encrypt(password.getMpassword1());
+        user1.setMpassword(p);
+
+        return  userService.updatedetail(user1);
+    }  @PostMapping("currentphone")
+    public  Result currentphone(@RequestBody PasswordChange passwordandphone, HttpServletRequest httpServletRequest){
+        Object attribute = httpServletRequest.getSession().getAttribute(SessionKeys.USER_LOGINSTSTE);
+        User user=(User) attribute;
+        User user1=userService.getById(user.getId());
+        System.out.println("user1 = " + user1);
+       if(!MD5Util.encrypt(passwordandphone.getMpassword()).equals(user1.getMpassword())){
+            return Result.build(null,ResultCodeEnum.PASSWORD_ERROR);
+        } else if (!Objects.equals(passwordandphone.getPhone(), user1.getPhone())) {
+           return Result.build(null,ResultCodeEnum.PHONE_ERRORING);
+       } else if (Objects.equals(passwordandphone.getPhone(), passwordandphone.getPhone1())) {
+           return Result.build(null,ResultCodeEnum.PHONE_RE);
+       }
+        user1.setPhone(passwordandphone.getPhone1());
+        return  userService.updatedetail(user1);
+    }
     @PostMapping("logout")
     public Result<Object> logout(HttpServletRequest httpServletRequest) {
         httpServletRequest.getSession().removeAttribute(SessionKeys.USER_LOGINSTSTE);
