@@ -13,7 +13,7 @@ spring:
     druid:
       url: jdbc:mysql://47.108.146.53:3306/zali
       username: zjywxy
-      password: zjyWXY6!
+      password: ******
       driver-class-name: com.mysql.cj.jdbc.Driver
 
   session:
