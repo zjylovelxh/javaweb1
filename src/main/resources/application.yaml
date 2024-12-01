@@ -7,17 +7,9 @@ server:
 
 
 # 连接池配置
-#spring:
-#  datasource:
-#    type: com.alibaba.druid.pool.DruidDataSource
-#    druid:
-#      url: jdbc:mysql://47.108.146.53:3306/zjy_yhgl
-#      username: zjywxy
-#      password: zjyWXY6!
-#      driver-class-name: com.mysql.cj.jdbc.Driver
 spring:
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
+    type: com.alibaba.druid.pool.DruidDataSource  
     druid:
       url: jdbc:mysql://47.108.146.53:3306/zali
       username: zjywxy

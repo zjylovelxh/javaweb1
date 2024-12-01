@@ -1,7 +1,11 @@
 package com.zjy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.zjy.mysession.SessionKeys;
 import com.zjy.pojo.User;
 import com.zjy.service.UserService;
@@ -15,8 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
 * @author zjy26
@@ -100,6 +104,61 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         return Result.build(null,ResultCodeEnum.CDETAIL_ERROR);
     }
+    /**
+     * 根据标签搜索用户 - 内存查询
+     * @param tagNameList 用户拥有的标签
+     * @return
+     */
+    @Override
+    public List<User> searchUsersByTags(List<String> tagNameList) {
+      if (CollectionUtils.isEmpty(tagNameList)){
+          return null;
+      }
+      LambdaQueryWrapper<User> lambdaQueryWrapper=new LambdaQueryWrapper<>();
+      List<User> userlist=userMapper.selectList(lambdaQueryWrapper);
+      Gson gson=new Gson();
+      userlist.stream().filter(user->{
+          String usertags=user.getTags();
+          if(StringUtils.isBlank(usertags)){
+              return false;
+          }
+          Set<String> tagnameset=gson.fromJson(usertags,new TypeToken<Set<String>>(){}.getType());
+          tagnameset=Optional.ofNullable(tagnameset).orElse(new HashSet<>());
+          for (String s : tagNameList) {
+              if(!tagnameset.contains(s)){
+                  return false;
+              }
+
+          }
+          return true;
+
+      }).map(this::getSafetyUser).collect(Collectors.toList());
+        //map将用户信息脱敏传给collect并集合成一个用户list列表
+        return userlist;
+    }
+    public User getSafetyUser(User originUser)  {
+        if (originUser == null) {
+            return null;
+        }
+        User safetyUser = new User();
+        safetyUser.setId(originUser.getId());
+        safetyUser.setUname(originUser.getUname());
+
+        safetyUser.setUaccount(originUser.getUaccount());
+        safetyUser.setAvatarurl(originUser.getAvatarurl());
+        safetyUser.setGender(originUser.getGender());
+        safetyUser.setPhone(originUser.getPhone());
+        safetyUser.setEmail(originUser.getEmail());
+        safetyUser.setUstatus(originUser.getUstatus());
+        safetyUser.setUpdatetime(originUser.getUpdatetime());
+        safetyUser.setTags(originUser.getTags());
+        safetyUser.setCreatetime(originUser.getCreatetime());
+        safetyUser.setIsdeleted(originUser.getIsdeleted());
+        return safetyUser;
+    }
+
+
+
 }
 
 

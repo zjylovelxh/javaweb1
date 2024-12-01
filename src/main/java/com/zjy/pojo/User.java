@@ -35,6 +35,7 @@ public class User implements Serializable {
 
 
     private Date updatetime;
+    private  String tags;
 
     @Version
     private Integer version;

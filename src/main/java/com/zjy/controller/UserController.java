@@ -24,6 +24,8 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("user")
@@ -171,6 +173,14 @@ public class UserController {
             user.setEmail(user1.getEmail());
         }if(user.getGender()==null){
             user.setGender(user1.getGender());
+        }
+
+        //验证邮箱有效性
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        Pattern pattern = Pattern.compile(emailRegex); // 编译正则表达式
+        Matcher matcher = pattern.matcher(user.getEmail());       // 创建匹配器，传入需要验证的邮箱
+        if(!matcher.matches()){
+            return Result.build(null,ResultCodeEnum.EMAILL_ERROR);
         }
         System.out.println("user = " + user);
         Result result = userService.updatedetail(user);

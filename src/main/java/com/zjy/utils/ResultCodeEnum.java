@@ -7,7 +7,7 @@ public enum ResultCodeEnum {
 
     SUCCESS(200, "success"),
     USERACCOUNT_ERROR(501, "账户名不规范"),
-    PASSWORD_ERROR(503, "密码不规范()"),
+    PASSWORD_ERROR(503, "密码不规范"),
     NOTLOGIN(504, "未登录"),
     MESSAGE_USED(505, "信息被占用"),
     MESSAGE_NUll(506,"请填写完整信息"),
@@ -23,7 +23,8 @@ public enum ResultCodeEnum {
     PASSWORD_ERRORING(516,"密码输入错误！"),
     PHONE_ERRORING(517,"电话号码不正确！"),
     PHONE_RE(518,"新旧电话号码相同！"),
-    UPDATE_ERROE(519,"没有值修改");
+    UPDATE_ERROE(519,"没有值修改"),
+    EMAILL_ERROR(520,"邮箱格式错误！");
 
 
     private Integer code;

@@ -18,6 +18,7 @@
             <result property="updatetime" column="updateTime" jdbcType="TIMESTAMP"/>
             <result property="version" column="version" jdbcType="INTEGER"/>
             <result property="isdeleted" column="isDeleted" jdbcType="INTEGER"/>
+            <result property="tags" column="tags" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -25,7 +26,7 @@
         avatarUrl,gender,mpassword,
         phone,email,ustatus,
         createTime,updateTime,version,
-        isDeleted
+        isDeleted,tags
     </sql>
 
     <update id="changeuser">
